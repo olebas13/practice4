@@ -1,7 +1,29 @@
-import dbconnector as db
+import pymysql
+import pymysql.cursors
 import csv
 import sys
 from decimal import Decimal, DecimalException
+
+connection = None
+
+try:
+    conn = pymysql.connect(
+        host = 'helensbi.mysql.tools',
+        user = 'helensbi_cheminf',
+        password = 'pMnh9J778KMv',
+        db = 'helensbi_db',
+        cursorclass = pymysql.cursors.DictCursor
+    )
+    connection = conn
+except pymysql.err.InternalError:
+    print("Помилка підключення до бази. Перевірте параметри підключення")
+    sys.exit()
+except pymysql.err.OperationalError:
+    print("Помилка підключення до бази. Перевірте параметри підключення")
+    sys.exit()
+except RuntimeError:
+    print("Помилка підключення до бази. Перевірте параметри підключення")
+    sys.exit()
 
 try:
     CSV_FILENAME = input("Введіть назву CSV-файла в форматі <назва>.csv: ")
@@ -70,7 +92,6 @@ with open(CSV_FILENAME, "r", newline = "") as file:
         except DecimalException:
             print("Некоректний тип значення mdl структури")
 
-connection = db.getConnection()
 
 query_select = "select * from ci_structures where smile = %s"
 insert = "insert into ci_structures (smile, name, inChi, mass, logP, cas, mdl) values (%s, %s, %s, %s, %s, %s, %s)"
